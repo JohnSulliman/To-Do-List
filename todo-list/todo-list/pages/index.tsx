@@ -7,10 +7,10 @@ import { CompletedTaskList } from '../components/CompletedTaskList';
 interface State {
   newTask: Task;
   tasks: Task[];
-}
+};
 
 export default function Home() {
-  const [isCompletedActive, setCompletedListActive] = useState(false);
+  const [completedListActive, setCompletedListActive] = useState(false);
   const [newTask, setNewTask] = useState({
     id: 1,
     name: '',
@@ -44,10 +44,45 @@ export default function Home() {
     setCompletedTasks( [...completedTasks, taskToDelete] )
   };
 
+  const undoTask = (taskToUndo: Task) => {
+    setCompletedTasks( [...completedTasks.filter(task => task.id !== taskToUndo.id)] )
+    setTasks([...tasks, taskToUndo])
+  };
+
+  const completeListActiveElement = (
+    <>
+      <input 
+        onChange={() => setCompletedListActive(!completedListActive)}
+        type='checkbox'
+        defaultValue={completedListActive.toString()}
+        id='completedListActive'
+      />
+      <label htmlFor='completedListActive'>Tarefas Concluídas</label>
+    </>
+  )
+
   return (
 
     <div>
+
       <h1>To-do da Blue ✔</h1>
+
+      <TaskForm 
+        onChange={handleTaskChange}
+        onAdd={addTask}
+        task={newTask}
+        disabled={newTask.name.length == 0}
+      />
+
+      {completeListActiveElement}
+
+      <div>
+        <TaskList tasks={tasks} onDelete={deleteTask} />
+        {completedListActive ? (
+          <CompletedTaskList tasks={completedTasks} onDelete={undoTask} />
+        ) : null}
+      </div>
+
     </div>
 
   );
